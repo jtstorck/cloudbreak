@@ -2,6 +2,7 @@ package com.sequenceiq.cloudbreak.core.flow2.service;
 
 import javax.inject.Inject;
 
+import com.sequenceiq.cloudbreak.core.flow2.event.InstanceRecoveryTriggerEvent;
 import org.springframework.stereotype.Service;
 
 import com.sequenceiq.cloudbreak.api.model.HostGroupAdjustmentJson;
@@ -71,7 +72,7 @@ public class ReactorFlowManager {
 
     public void triggerStackRemoveInstance(Long stackId, String instanceId) {
         String selector = FlowTriggers.REMOVE_INSTANCE_TRIGGER_EVENT;
-        InstanceTerminationTriggerEvent event = new InstanceTerminationTriggerEvent(selector, stackId, instanceId);
+        InstanceTerminationTriggerEvent event = new InstanceTerminationTriggerEvent(selector, stackId, instanceId, true);
         reactor.notify(selector, eventFactory.createEvent(event, selector));
     }
 
@@ -144,6 +145,13 @@ public class ReactorFlowManager {
     public void triggerClusterTermination(Long stackId) {
         String selector = FlowTriggers.CLUSTER_TERMINATION_TRIGGER_EVENT;
         reactor.notify(selector, eventFactory.createEvent(new StackEvent(selector, stackId), selector));
+    }
+
+    public void triggerRecovery(Long stackId, String instanceId, String groupName) {
+        String selector = FlowTriggers.RECOVER_INSTANCE_TRIGGER_EVENT;
+        InstanceRecoveryTriggerEvent instanceRecoveryTriggerEvent = new InstanceRecoveryTriggerEvent(
+                selector, stackId, instanceId, groupName);
+        reactor.notify(selector, eventFactory.createEvent(instanceRecoveryTriggerEvent, selector));
     }
 }
 

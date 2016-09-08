@@ -24,6 +24,7 @@ import com.sequenceiq.cloudbreak.service.cluster.flow.ClusterTerminationService;
 import com.sequenceiq.cloudbreak.service.cluster.flow.EmailSenderService;
 import com.sequenceiq.cloudbreak.service.stack.flow.TerminationFailedException;
 
+
 @Component
 public class ClusterCreationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterCreationService.class);

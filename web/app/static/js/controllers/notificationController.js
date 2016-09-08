@@ -11,7 +11,7 @@ angular.module('uluwatuControllers').controller('notificationController', ['$sco
             "STOPPED",
             "STOP_REQUESTED",
             "STOP_IN_PROGRESS",
-            "DELETE_IN_PROGRESS"
+            "DELETE_IN_PROGRESS",
         ];
 
         var errorEvents = ["CLUSTER_CREATION_FAILED",
@@ -19,7 +19,8 @@ angular.module('uluwatuControllers').controller('notificationController', ['$sco
             "START_FAILED",
             "DELETE_FAILED",
             "UPDATE_FAILED",
-            "STOP_FAILED"
+            "STOP_FAILED",
+            "NODE_DOWN"
         ];
 
         var socket = io();

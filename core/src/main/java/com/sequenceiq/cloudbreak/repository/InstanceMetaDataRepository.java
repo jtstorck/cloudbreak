@@ -31,4 +31,6 @@ public interface InstanceMetaDataRepository extends CrudRepository<InstanceMetaD
 
     InstanceMetaData findNotTerminatedByPrivateAddress(@Param("stackId") Long stackId, @Param("privateAddress") String privateAddress);
 
+    InstanceMetaData findByPrivateIp(@Param("stackId") Long stackId, @Param("privateIp") String privateIp);
+
 }

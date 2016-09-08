@@ -66,7 +66,12 @@ import com.sequenceiq.cloudbreak.api.model.InstanceStatus;
                 query = "SELECT i FROM InstanceMetaData i "
                         + "WHERE i.instanceGroup.stack.id= :stackId "
                         + "AND i.privateIp= :privateAddress "
-                        + "AND i.instanceStatus <> 'TERMINATED' ")
+                        + "AND i.instanceStatus <> 'TERMINATED' "),
+        @NamedQuery(
+                name = "InstanceMetaData.findByPrivateIp",
+                query = "SELECT i FROM InstanceMetaData i "
+                        + "WHERE i.instanceGroup.stack.id= :stackId "
+                        + "AND i.privateIp= :privateIp ")
 })
 public class InstanceMetaData implements ProvisionEntity {
 

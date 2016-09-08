@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +74,8 @@ public class StackSyncService {
     private ServiceProviderMetadataAdapter metadata;
     @Inject
     private CloudbreakMessagesService cloudbreakMessagesService;
+
+    private Set<String> ambariServersMonitored = new HashSet<>();
 
     public void updateInstances(Stack stack, List<InstanceMetaData> instanceMetaDataList, List<CloudVmInstanceStatus> instanceStatuses,
             boolean stackStatusUpdateEnabled) {
@@ -176,6 +179,12 @@ public class StackSyncService {
 
     private void handleSyncResult(Stack stack, Map<InstanceSyncState, Integer> instanceStateCounts, boolean stackStatusUpdateEnabled) {
         Set<InstanceMetaData> instances = instanceMetaDataRepository.findNotTerminatedForStack(stack.getId());
+        for (InstanceMetaData instanceMetaData : instances) {
+            if (instanceMetaData.getAmbariServer()) {
+                LOGGER.warn("Found ambari server: " + instanceMetaData.getPublicIp() + ", trying to start monitoring.");
+                startMonitoringAmbari(stack, instanceMetaData);
+            }
+        }
         if (instanceStateCounts.get(InstanceSyncState.UNKNOWN) > 0) {
             eventService.fireCloudbreakEvent(stack.getId(), AVAILABLE.name(),
                     cloudbreakMessagesService.getMessage(Msg.STACK_SYNC_INSTANCE_STATUS_COULDNT_DETERMINE.code()));
@@ -197,6 +206,21 @@ public class StackSyncService {
             updateStackStatusIfEnabled(stack.getId(), DELETE_FAILED, SYNC_STATUS_REASON, stackStatusUpdateEnabled);
             eventService.fireCloudbreakEvent(stack.getId(), DELETE_FAILED.name(),
                     cloudbreakMessagesService.getMessage(Msg.STACK_SYNC_INSTANCE_STATE_SYNCED.code()));
+        }
+    }
+
+    private void startMonitoringAmbari(Stack stack, InstanceMetaData instanceMetaData) {
+        String ambariServerIp = instanceMetaData.getPublicIp();
+        if (!ambariServersMonitored.contains(ambariServerIp)) {
+            LOGGER.warn("Server " + ambariServerIp + " is not monitored, starting monitoring");
+            Thread ambariMonitor = new Thread(new AmbariMonitorRunnable(stackService, eventService, stack.getId(), ambariServerIp),
+                    "ambari-monitor-thread");
+            ambariMonitor.setDaemon(true);
+            ambariMonitor.start();
+            ambariServersMonitored.add(ambariServerIp);
+            LOGGER.warn("Server " + ambariServerIp + " started monitoring");
+        } else {
+            LOGGER.warn("Server " + ambariServerIp + " is already monitored");
         }
     }
 

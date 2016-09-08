@@ -33,6 +33,7 @@ public class FlowTriggers {
     public static final String STACK_TERMINATE_TRIGGER_EVENT = "STACK_TERMINATE_TRIGGER_EVENT";
     public static final String STACK_FORCE_TERMINATE_TRIGGER_EVENT = "STACK_FORCE_TERMINATE_TRIGGER_EVENT";
     public static final String CLUSTER_TERMINATION_TRIGGER_EVENT = "CLUSTER_TERMINATION_TRIGGER_EVENT";
+    public static final String RECOVER_INSTANCE_TRIGGER_EVENT = "RECOVER_INSTANCE_TRIGGER_EVENT";
 
     private FlowTriggers() {
     }

@@ -556,6 +556,16 @@ public class StackService {
         }
     }
 
+    public void recoverInstance(Long stackId, String privateIp) {
+        LOGGER.info("Trying to recover instance: " + privateIp);
+
+        InstanceMetaData failedInstance = instanceMetaDataRepository.findByPrivateIp(stackId, privateIp);
+        LOGGER.info("Triggering recovery of failed instance: " + failedInstance.getInstanceId() +
+                ", ip=" + failedInstance.getPrivateIp());
+        flowManager.triggerRecovery(stackId, failedInstance.getInstanceId(), failedInstance.getInstanceGroup().getGroupName());
+        LOGGER.info("Triggered termination");
+    }
+
     private enum Msg {
         STACK_STOP_IGNORED("stack.stop.ignored"),
         STACK_START_IGNORED("stack.start.ignored"),

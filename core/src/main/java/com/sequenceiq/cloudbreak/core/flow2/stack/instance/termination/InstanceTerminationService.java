@@ -37,7 +37,7 @@ public class InstanceTerminationService {
     @Inject
     private HostMetadataRepository hostMetadataRepository;
 
-    public void instanceTermination(InstanceTerminationContext context) {
+    public void instanceTermination(InstanceTerminationContext context, boolean checkState) {
         Stack stack = context.getStack();
         stackUpdater.updateStackStatus(stack.getId(), UPDATE_IN_PROGRESS, "Removing instance");
         flowMessageService.fireEventAndLog(stack.getId(), Msg.STACK_REMOVING_INSTANCE, UPDATE_IN_PROGRESS.name());
@@ -47,7 +47,7 @@ public class InstanceTerminationService {
             HostMetadata hostMetadata = hostMetadataRepository.findHostInClusterByName(stack.getCluster().getId(), hostName);
             if (hostMetadata == null) {
                 LOGGER.info("Nothing to remove since hostmetadata is null");
-            } else if (hostMetadata != null && HostMetadataState.HEALTHY.equals(hostMetadata.getHostMetadataState())) {
+            } else if (checkState && hostMetadata != null && HostMetadataState.HEALTHY.equals(hostMetadata.getHostMetadataState())) {
                 throw new ScalingFailedException(String.format("Host (%s) is in HEALTHY state. Cannot be removed.", hostName));
             }
         }
