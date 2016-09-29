@@ -1,2 +1,2 @@
-aws:{{$aws:=httpget "https://atlas.hashicorp.com/api/v1/artifacts/sequenceiq/cloudbreak/amazon.image/search" | json | pointer "/versions/0"}}{{range $k,$v :=  $aws.id | split "," | splitkv ":"}}
+aws:{{$url:=printf "https://atlas.hashicorp.com/api/v1/artifacts/sequenceiq/cloudbreak/amazon.image/search?version=%s" $version}}{{$atlas:=httpget $url | json | pointer "/versions/0"}}{{range $k,$v :=  $atlas.id | split "," | splitkv ":"}}
   {{$k}}: {{$v}}{{end}}

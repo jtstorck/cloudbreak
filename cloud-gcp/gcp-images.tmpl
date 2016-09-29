@@ -1,2 +1,2 @@
-gcp:{{$atlas:=httpget "https://atlas.hashicorp.com/api/v1/artifacts/sequenceiq/cloudbreak/googlecompute.image/search" | json | pointer "/versions/0"}}
+gcp:{{$url:=printf "https://atlas.hashicorp.com/api/v1/artifacts/sequenceiq/cloudbreak/googlecompute.image/search?version=%s" $version}}{{$atlas:=httpget $url | json | pointer "/versions/0"}}
   default: sequenceiqimage/{{ $atlas.id }}.tar.gz
