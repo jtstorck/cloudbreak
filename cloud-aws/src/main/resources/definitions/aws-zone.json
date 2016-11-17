@@ -74,6 +74,21 @@
         "ap-southeast-1a",
         "ap-southeast-1b"
       ]
+    },
+    {
+      "name": "ap-south-1",
+      "zones": [
+        "ap-south-1a",
+        "ap-south-1b"
+      ]
+    },
+    {
+      "name": "us-east-2",
+      "zones": [
+        "us-east-2a",
+        "us-east-2b",
+        "us-east-2c"
+      ]
     }
   ]
 }
