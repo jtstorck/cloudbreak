@@ -5,6 +5,7 @@ base:
     - nodes.hosts
     - discovery.init
     - recipes.init
+    - consul.init
 
   'roles:gateway':
     - match: grain
