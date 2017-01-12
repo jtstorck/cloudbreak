@@ -627,6 +627,7 @@ public class AmbariClusterService implements ClusterService {
         return stack.getCluster();
 
     }
+
     private Cluster prepareCluster(Set<HostGroup> hostGroups, HDPRepo hdpRepo, Blueprint blueprint, Stack stack, Cluster cluster) {
         cluster.setBlueprint(blueprint);
         cluster.getHostGroups().clear();
@@ -644,6 +645,7 @@ public class AmbariClusterService implements ClusterService {
         }
         return stack.getCluster();
     }
+
     private Cluster getCluster(Long stackId, Stack stack) {
         Cluster cluster = clusterRepository.findById(stack.getCluster().getId());
         if (cluster == null) {

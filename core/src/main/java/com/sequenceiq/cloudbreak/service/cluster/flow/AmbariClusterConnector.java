@@ -327,7 +327,8 @@ public class AmbariClusterConnector {
         }
         blueprintText = smartSenseConfigProvider.addToBlueprint(stack, blueprintText);
         blueprintText = zeppelinConfigProvider.addToBlueprint(stack, blueprintText);
-        if (!OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())) {
+        if (!OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())
+                && !OrchestratorConstants.YARN.equals(stack.getOrchestrator().getType())) {
             HDPRepo hdpRepo = componentConfigProvider.getHDPRepo(stack.getId());
             if (hdpRepo != null && hdpRepo.getHdpVersion() != null) {
                 blueprintText = blueprintProcessor.modifyHdpVersion(blueprintText, hdpRepo.getHdpVersion());

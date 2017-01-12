@@ -235,6 +235,6 @@ public class RecipeEngine {
     }
 
     private boolean recipesSupportedOnOrchestrator(Orchestrator orchestrator) {
-        return !OrchestratorConstants.MARATHON.equals(orchestrator.getType());
+        return !OrchestratorConstants.MARATHON.equals(orchestrator.getType()) && !OrchestratorConstants.YARN.equals(orchestrator.getType());
     }
 }
