@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.sequenceiq.cloudbreak.common.type.OrchestratorConstants;
 import com.sequenceiq.cloudbreak.domain.Cluster;
 import com.sequenceiq.cloudbreak.domain.Constraint;
 import com.sequenceiq.cloudbreak.domain.HostGroup;
@@ -204,9 +205,13 @@ public class ContainerConstraintFactory {
 
     public ContainerConstraint getAmbariAgentConstraint(String ambariServerHost, String ambariAgentApp, String cloudPlatform,
             HostGroup hostGroup, Integer adjustment, List<String> hostBlackList) {
+        String containerInstanceName = createContainerInstanceName(hostGroup, AMBARI_AGENT.getName());
+        if (OrchestratorConstants.YARN.equals(hostGroup.getCluster().getStack().getOrchestrator().getType())) {
+            containerInstanceName = createContainerInstanceNameForYarn(hostGroup, AMBARI_AGENT.getName());
+        }
         Constraint hgConstraint = hostGroup.getConstraint();
         ContainerConstraint.Builder builder = new ContainerConstraint.Builder()
-                .withNamePrefix(createContainerInstanceName(hostGroup, AMBARI_AGENT.getName()))
+                .withNamePrefix(containerInstanceName)
                 .withAppName(ambariAgentApp)
                 .networkMode(HOST_NETWORK_MODE);
         if (hgConstraint.getInstanceGroup() != null) {
@@ -328,6 +333,21 @@ public class ContainerConstraintFactory {
 
     private String createContainerInstanceName(String containerName, String clusterName, String hostGroupName) {
         String separator = "-";
+        return createContainerInstanceNameWithSeparator(containerName, clusterName, hostGroupName, separator);
+    }
+
+    private String createContainerInstanceNameForYarn(HostGroup hostGroup, String containerName) {
+        String hostGroupName = hostGroup.getName();
+        String clusterName = hostGroup.getCluster().getName();
+        return createContainerInstanceNameForYarn(containerName, hostGroupName, clusterName);
+    }
+
+    private String createContainerInstanceNameForYarn(String containerName, String clusterName, String hostGroupName) {
+        String separator = "%";
+        return createContainerInstanceNameWithSeparator(containerName, clusterName, hostGroupName, separator);
+    }
+
+    private String createContainerInstanceNameWithSeparator(String containerName, String clusterName, String hostGroupName, String separator) {
         StringBuilder sb = new StringBuilder(containerName);
         if (!StringUtils.isEmpty(hostGroupName)) {
             sb.append(separator).append(hostGroupName);
