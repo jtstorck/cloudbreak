@@ -29,6 +29,7 @@ import com.sequenceiq.cloudbreak.api.model.LdapConfigResponse;
 import com.sequenceiq.cloudbreak.api.model.RDSConfigResponse;
 import com.sequenceiq.cloudbreak.api.model.SssdConfigResponse;
 import com.sequenceiq.cloudbreak.client.HttpClientConfig;
+import com.sequenceiq.cloudbreak.common.type.OrchestratorConstants;
 import com.sequenceiq.cloudbreak.controller.json.JsonHelper;
 import com.sequenceiq.cloudbreak.controller.validation.blueprint.BlueprintValidator;
 import com.sequenceiq.cloudbreak.controller.validation.blueprint.StackServiceComponentDescriptor;
@@ -130,10 +131,14 @@ public class ClusterToJsonConverter extends AbstractConversionServiceAwareConver
     }
 
     private String getAmbariIp(Cluster cluster) {
-        Set<InstanceMetaData> gateway = cluster.getStack().getGatewayInstanceGroup().getInstanceMetaData();
         String ambariIp = null;
-        if (cluster.getAmbariIp() != null && gateway != null && !gateway.isEmpty()) {
-            ambariIp = gateway.iterator().next().getPublicIpWrapper();
+        if (!OrchestratorConstants.YARN.equals(cluster.getStack().getOrchestrator().getType())) {
+            Set<InstanceMetaData> gateway = cluster.getStack().getGatewayInstanceGroup().getInstanceMetaData();
+            if (cluster.getAmbariIp() != null && gateway != null && !gateway.isEmpty()) {
+                ambariIp = gateway.iterator().next().getPublicIpWrapper();
+            }
+        } else {
+            ambariIp = cluster.getAmbariIp();
         }
         return ambariIp;
     }
