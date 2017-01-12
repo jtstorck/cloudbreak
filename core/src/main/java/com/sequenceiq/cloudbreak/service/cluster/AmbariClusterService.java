@@ -6,6 +6,7 @@ import static com.sequenceiq.cloudbreak.api.model.Status.START_REQUESTED;
 import static com.sequenceiq.cloudbreak.api.model.Status.STOP_REQUESTED;
 import static com.sequenceiq.cloudbreak.api.model.Status.UPDATE_REQUESTED;
 import static com.sequenceiq.cloudbreak.common.type.OrchestratorConstants.MARATHON;
+import static com.sequenceiq.cloudbreak.common.type.OrchestratorConstants.YARN;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -600,10 +601,7 @@ public class AmbariClusterService implements ClusterService {
             throw new BadRequestException(String.format("Blueprint not exists with '%s' id.", blueprintId));
         }
         Stack stack = stackService.getById(stackId);
-        Cluster cluster = clusterRepository.findById(stack.getCluster().getId());
-        if (cluster == null) {
-            throw new BadRequestException(String.format("Cluster does not exist on stack with '%s' id.", stackId));
-        }
+        Cluster cluster = getCluster(stackId, stack);
         AmbariDatabase ambariDatabase = componentConfigProvider.getAmbariDatabase(stackId);
         if (ambariDatabase != null && !DatabaseVendor.EMBEDDED.value().equals(ambariDatabase.getVendor())) {
             throw new BadRequestException("Ambari doesn't support resetting external DB automatically. To reset Ambari Server schema you must first drop "
@@ -613,12 +611,23 @@ public class AmbariClusterService implements ClusterService {
             blueprintValidator.validateBlueprintForStack(blueprint, hostGroups, stack.getInstanceGroups());
         }
 
-        if (MARATHON.equals(stack.getOrchestrator().getType())) {
+        if (MARATHON.equals(stack.getOrchestrator().getType()) || YARN.equals(stack.getOrchestrator().getType())) {
             clusterTerminationService.deleteClusterContainers(cluster.getId());
             cluster = clusterRepository.findById(stack.getCluster().getId());
         }
 
         hostGroups = hostGroupService.saveOrUpdateWithMetadata(hostGroups, cluster);
+        cluster = prepareCluster(hostGroups, hdpRepo, blueprint, stack, cluster);
+
+        try {
+            triggerClusterInstall(stack, cluster);
+        } catch (CloudbreakException e) {
+            throw new CloudbreakServiceException(e);
+        }
+        return stack.getCluster();
+
+    }
+    private Cluster prepareCluster(Set<HostGroup> hostGroups, HDPRepo hdpRepo, Blueprint blueprint, Stack stack, Cluster cluster) {
         cluster.setBlueprint(blueprint);
         cluster.getHostGroups().clear();
         cluster.getHostGroups().addAll(hostGroups);
@@ -634,6 +643,13 @@ public class AmbariClusterService implements ClusterService {
             throw new CloudbreakServiceException(e);
         }
         return stack.getCluster();
+    }
+    private Cluster getCluster(Long stackId, Stack stack) {
+        Cluster cluster = clusterRepository.findById(stack.getCluster().getId());
+        if (cluster == null) {
+            throw new BadRequestException(String.format("Cluster does not exist on stack with '%s' id.", stackId));
+        }
+        return cluster;
     }
 
     @Override
