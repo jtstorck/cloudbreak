@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.converter;
 
+import static com.sequenceiq.cloudbreak.common.type.OrchestratorConstants.YARN;
 import static com.sequenceiq.cloudbreak.service.network.ExposedService.SHIPYARD;
 
 import java.io.IOException;
@@ -160,10 +161,14 @@ public class ClusterToJsonConverter extends AbstractConversionServiceAwareConver
     }
 
     private String getAmbariIp(Cluster cluster) {
-        Set<InstanceMetaData> gateway = cluster.getStack().getGatewayInstanceGroup().getInstanceMetaData();
         String ambariIp = null;
-        if (cluster.getAmbariIp() != null && gateway != null && !gateway.isEmpty()) {
-            ambariIp = gateway.iterator().next().getPublicIpWrapper();
+        if (!YARN.equals(cluster.getStack().getOrchestrator().getType())) {
+            Set<InstanceMetaData> gateway = cluster.getStack().getGatewayInstanceGroup().getInstanceMetaData();
+            if (cluster.getAmbariIp() != null && gateway != null && !gateway.isEmpty()) {
+                ambariIp = gateway.iterator().next().getPublicIpWrapper();
+            }
+        } else {
+            ambariIp = cluster.getAmbariIp();
         }
         return ambariIp;
     }
