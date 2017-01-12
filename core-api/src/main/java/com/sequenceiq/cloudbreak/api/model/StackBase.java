@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sequenceiq.cloudbreak.doc.ModelDescriptions;
 import com.sequenceiq.cloudbreak.doc.ModelDescriptions.StackModelDescription;
+import com.sequenceiq.cloudbreak.common.type.OrchestratorConstants;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -95,7 +96,7 @@ public abstract class StackBase implements JsonEntity {
     }
 
     public String getRegion() {
-        return region;
+        return OrchestratorConstants.YARN;
     }
 
     public void setRegion(String region) {

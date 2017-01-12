@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConstraintJson {
 
-    @NotNull
+    //@NotNull
     @ApiModelProperty(value = ModelDescriptions.HostGroupModelDescription.INSTANCE_GROUP, required = true)
     private String instanceGroupName;
 
