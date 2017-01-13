@@ -3,6 +3,7 @@ package com.sequenceiq.cloudbreak.converter;
 import static com.gs.collections.impl.utility.StringIterate.isEmpty;
 import static com.sequenceiq.cloudbreak.cloud.model.Platform.platform;
 import static com.sequenceiq.cloudbreak.common.type.OrchestratorConstants.MARATHON;
+import static com.sequenceiq.cloudbreak.common.type.OrchestratorConstants.YARN;
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 
 import java.util.Calendar;
@@ -133,7 +134,8 @@ public class JsonToStackConverter extends AbstractConversionServiceAwareConverte
             }
         }
         boolean orchestratorIsMarathon = MARATHON.equals(source.getOrchestrator().getType());
-        if (!gatewaySpecified && !orchestratorIsMarathon) {
+        boolean orchestratorIsYarn = YARN.equals(source.getOrchestrator().getType());
+        if (!gatewaySpecified && !orchestratorIsMarathon && !orchestratorIsYarn) {
             throw new BadRequestException("Ambari server must be specified");
         }
         return convertedSet;
