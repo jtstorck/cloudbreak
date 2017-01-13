@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.sequenceiq.cloudbreak.api.model.DetailedStackStatus;
 import com.sequenceiq.cloudbreak.api.model.FileSystemType;
 import com.sequenceiq.cloudbreak.api.model.InstanceStatus;
+import com.sequenceiq.cloudbreak.common.type.OrchestratorConstants;
 import com.sequenceiq.cloudbreak.domain.Cluster;
 import com.sequenceiq.cloudbreak.domain.InstanceGroup;
 import com.sequenceiq.cloudbreak.domain.InstanceMetaData;
@@ -63,10 +64,15 @@ public class TerminationService {
             Date now = new Date();
             String terminatedName = stack.getName() + DELIMITER + now.getTime();
             Cluster cluster = stack.getCluster();
-            if (!force && cluster != null) {
-                throw new TerminationFailedException(String.format("There is a cluster installed on stack '%s', terminate it first!.", stackId));
-            } else if (cluster != null) {
+            if (cluster != null && OrchestratorConstants.YARN.equals(stack.getOrchestrator().getType())) {
+                clusterTerminationService.deleteClusterContainers(cluster.getId());
                 clusterTerminationService.finalizeClusterTermination(cluster.getId());
+            } else {
+                if (!force && cluster != null) {
+                    throw new TerminationFailedException(String.format("There is a cluster installed on stack '%s', terminate it first!.", stackId));
+                } else if (cluster != null) {
+                    clusterTerminationService.finalizeClusterTermination(cluster.getId());
+                }
             }
             stack.setCredential(null);
             stack.setNetwork(null);
