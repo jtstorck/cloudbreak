@@ -44,6 +44,7 @@ import com.sequenceiq.cloudbreak.repository.StackRepository;
 import com.sequenceiq.cloudbreak.service.ComponentConfigProvider;
 import com.sequenceiq.cloudbreak.service.GatewayConfigService;
 import com.sequenceiq.cloudbreak.service.blueprint.BlueprintUtils;
+import com.sequenceiq.cloudbreak.service.cluster.AmbariAuthenticationProvider;
 import com.sequenceiq.cloudbreak.service.cluster.ClusterService;
 
 @Component
@@ -75,6 +76,9 @@ public class ClusterHostServiceRunner {
 
     @Inject
     private BlueprintUtils blueprintUtils;
+
+    @Inject
+    private AmbariAuthenticationProvider ambariAuthenticationProvider;
 
     public void runAmbariServices(Stack stack) throws CloudbreakException {
         try {
@@ -119,6 +123,10 @@ public class ClusterHostServiceRunner {
             if (ldapConfig != null && blueprintUtils.containsComponent(cluster.getBlueprint(), "KNOX_GATEWAY")) {
                 servicePillar.put("ldap", new SaltPillarProperties("/ldap/init.sls", singletonMap("ldap", ldapConfig)));
             }
+            Map<String, Object> credentials = new HashMap<>();
+            credentials.put("username", ambariAuthenticationProvider.getAmbariUserName(stack.getCluster()));
+            credentials.put("password", ambariAuthenticationProvider.getAmbariPassword(stack.getCluster()));
+            servicePillar.put("ambari-credentials", new SaltPillarProperties("/ambari/credentials.sls", singletonMap("ambari", credentials)));
             SaltPillarConfig saltPillarConfig = new SaltPillarConfig(servicePillar);
             hostOrchestrator.runService(gatewayConfig, nodes, saltPillarConfig, clusterDeletionBasedExitCriteriaModel(stack.getId(), cluster.getId()));
         } catch (CloudbreakOrchestratorCancelledException e) {
