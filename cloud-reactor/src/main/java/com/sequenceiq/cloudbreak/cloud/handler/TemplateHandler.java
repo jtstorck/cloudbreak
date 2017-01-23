@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.cloud.CloudConnector;
+import com.sequenceiq.cloudbreak.cloud.byos.BYOSConstants;
 import com.sequenceiq.cloudbreak.cloud.event.platform.GetPlatformTemplateRequest;
 import com.sequenceiq.cloudbreak.cloud.event.platform.GetPlatformTemplateResult;
 import com.sequenceiq.cloudbreak.cloud.exception.TemplatingDoesNotSupportedException;
@@ -33,6 +34,9 @@ public class TemplateHandler implements CloudPlatformEventHandler<GetPlatformTem
         String template;
         try {
             CloudConnector connector = cloudPlatformConnectors.get(request.getCloudContext().getPlatformVariant());
+            if (connector.variant().equals(BYOSConstants.BYOS_VARIANT)) {
+                throw new TemplatingDoesNotSupportedException();
+            }
             template = connector.resources().getStackTemplate();
         } catch (TemplatingDoesNotSupportedException e) {
             template = null;

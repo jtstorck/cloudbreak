@@ -19,6 +19,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
         $scope.credentialOpenstack = {};
         $scope.mesosStack = {};
         $scope.mesosStac = false;
+        $scope.yarnStack = {};
         $scope.awsCredentialForm = {};
         $scope.gcpCredentialForm = {};
         $scope.azureCredentialForm = {};
@@ -30,7 +31,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
         $scope.alertMessage = "";
         var firstVisiblePlatform = $scope.firstVisible(["AWS", "AZURE_RM", "BYOS", "GCP", "OPENSTACK"]);
         if (firstVisiblePlatform != -1) {
-            $scope[["awsCredential", "azureRmCredential", "mesosCredential", "gcpCredential", "openstackCredential"][firstVisiblePlatform]] = true;
+            $scope[["awsCredential", "azureRmCredential", "mesosCredential", "gcpCredential", "openstackCredential", "yarnCredential"][firstVisiblePlatform]] = true;
         }
 
         $scope.createAzureRmCredentialRequest = function() {
@@ -39,6 +40,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
             $scope.openstackCredential = false;
             $scope.azureRmCredential = true;
             $scope.mesosCredential = false;
+            $scope.yarnCredential = false;
         }
 
         $scope.createAwsCredentialRequest = function() {
@@ -47,6 +49,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
             $scope.openstackCredential = false;
             $scope.azureRmCredential = false;
             $scope.mesosCredential = false;
+            $scope.yarnCredential = false;
         }
 
         $scope.createGcpCredentialRequest = function() {
@@ -55,6 +58,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
             $scope.openstackCredential = false;
             $scope.azureRmCredential = false;
             $scope.mesosCredential = false;
+            $scope.yarnCredential = false;
         }
 
         $scope.createOpenstackCredentialRequest = function() {
@@ -63,6 +67,7 @@ angular.module('uluwatuControllers').controller('credentialController', [
             $scope.openstackCredential = true;
             $scope.azureRmCredential = false;
             $scope.mesosCredential = false;
+            $scope.yarnCredential = false;
         }
 
         $scope.importMesosStackRequest = function() {
@@ -71,6 +76,16 @@ angular.module('uluwatuControllers').controller('credentialController', [
             $scope.openstackCredential = false;
             $scope.azureRmCredential = false;
             $scope.mesosCredential = true;
+            $scope.yarnCredential = false;
+        }
+
+        $scope.importYarnStackRequest = function() {
+            $scope.awsCredential = false;
+            $scope.gcpCredential = false;
+            $scope.openstackCredential = false;
+            $scope.azureRmCredential = false;
+            $scope.mesosCredential = false;
+            $scope.yarnCredential = true;
         }
 
         $scope.refreshCertificateFile = function(credentialId) {
@@ -277,6 +292,38 @@ angular.module('uluwatuControllers').controller('credentialController', [
             }
         }
 
+        $scope.importYarnStack = function() {
+            $scope.credentialInCreation = true;
+            $scope.yarnStack.orchestrator.type = "YARN";
+            if ($scope.yarnStack.public) {
+                AccountStack.save($scope.yarnStack, function(result) {
+                    stackSuccessHandler(result)
+                }, function(error) {
+                    $scope.showError(error, $rootScope.msg.yarn_credential_failed);
+                    $scope.credentialInCreation = false;
+                    $scope.showErrorMessageAlert();
+                });
+            } else {
+                UserStack.save($scope.yarnStack, function(result) {
+                    stackSuccessHandler(result)
+                }, function(error) {
+                    $scope.showError(error, $rootScope.msg.yarn_credential_failed);
+                    $scope.credentialInCreation = false;
+                    $scope.showErrorMessageAlert();
+                });
+            }
+
+            function stackSuccessHandler(result) {
+                $scope.yarnStack.id = result.id;
+                $rootScope.importedStacks.push($scope.yarnStack);
+                $scope.yarnStack = {};
+                $scope.showSuccess($filter("format")($rootScope.msg.yarn_credential_success, String(result.id)));
+                $scope.yarnImportStackForm.$setPristine();
+                collapseCreateCredentialFormPanel();
+                $scope.credentialInCreation = false;
+                $scope.unShowErrorMessageAlert();
+            }
+        }
 
         $scope.deleteCredential = function(credential) {
             GlobalCredential.delete({
