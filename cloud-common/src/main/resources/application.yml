@@ -64,9 +64,9 @@ cb:
 
   docker:
     container:
-      ambari.server: hortonworks/ambari-server:2.4.0-v1
-      ambari.agent: hortonworks/ambari-agent:2.4.0-v1
-      ambari.db: postgres:9.4.1
+      ambari.server: registry.eng.hortonworks.com/cloudbreak/yarn-cloudbreak-ambari-server:0.1
+      ambari.agent: registry.eng.hortonworks.com/cloudbreak/yarn-cloudbreak-ambari-agent:0.1
+      ambari.db: registry.eng.hortonworks.com/cloudbreak/yarn-cloudbreak-postgres:0.1
       registrator: gliderlabs/registrator:v6
       docker.consul.watch.plugn: sequenceiq/docker-consul-watch-plugn:1.6
       kerberos: sequenceiq/kerberos:1.1

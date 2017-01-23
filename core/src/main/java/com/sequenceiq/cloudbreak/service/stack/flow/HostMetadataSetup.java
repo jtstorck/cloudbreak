@@ -55,7 +55,7 @@ public class HostMetadataSetup {
         LOGGER.info("Extending host metadata.");
         Stack stack = stackService.getById(stackId);
         if (!OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())
-                && !OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())) {
+                && !OrchestratorConstants.YARN.equals(stack.getOrchestrator().getType())) {
             Set<InstanceMetaData> newInstanceMetadata = stack.getRunningInstanceMetaData().stream()
                     .filter(instanceMetaData -> newAddresses.contains(instanceMetaData.getPrivateIp()))
                     .collect(Collectors.toSet());

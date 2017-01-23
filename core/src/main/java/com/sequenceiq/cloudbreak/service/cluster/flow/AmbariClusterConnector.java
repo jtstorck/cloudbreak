@@ -715,7 +715,8 @@ public class AmbariClusterConnector {
 
     private void setBaseRepoURL(Stack stack, AmbariClient ambariClient) throws IOException, CloudbreakImageNotFoundException {
         HDPRepo hdpRepo = null;
-        if (!OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())) {
+        if (!OrchestratorConstants.MARATHON.equals(stack.getOrchestrator().getType())
+                && !OrchestratorConstants.YARN.equals(stack.getOrchestrator().getType())) {
             hdpRepo = componentConfigProvider.getHDPRepo(stack.getId());
         }
         if (hdpRepo != null) {

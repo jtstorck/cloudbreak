@@ -110,7 +110,7 @@ public class ClusterBootstrapper {
 
         if (orchestratorType.hostOrchestrator()) {
             bootstrapOnHost(stack);
-        } else if (OrchestratorConstants.MARATHON.equals(stackOrchestratorType)) {
+        } else if (OrchestratorConstants.MARATHON.equals(stackOrchestratorType) || OrchestratorConstants.YARN.equals(stackOrchestratorType)) {
             LOGGER.info("Skipping bootstrap of the machines because the stack's orchestrator type is '{}'.", stackOrchestratorType);
         } else if (orchestratorType.containerOrchestrator()) {
             bootstrapContainers(stack);
