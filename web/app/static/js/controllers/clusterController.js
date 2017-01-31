@@ -1322,15 +1322,17 @@ angular.module('uluwatuControllers').controller('clusterController', ['$scope', 
         $scope.ambariServerSelected = function() {
             var result = false
             var activeStack = $rootScope.activeStack;
-            var isByos = activeStack.orchestrator.type === "MARATHON" || activeStack.orchestrator.type === "YARN"
-            if (activeStack && activeStack.orchestrator && isByos) {
-                return true;
-            }
-            angular.forEach($scope.cluster.instanceGroups, function(ig) {
-                if (ig.type === 'GATEWAY') {
-                    result = true
+            if (activeStack != null) {
+                var isByos = activeStack.orchestrator.type === "MARATHON" || activeStack.orchestrator.type === "YARN"
+                if (activeStack && activeStack.orchestrator && isByos) {
+                    return true;
                 }
-            });
+                angular.forEach($scope.cluster.instanceGroups, function(ig) {
+                    if (ig.type === 'GATEWAY') {
+                        result = true
+                    }
+                });
+            }
             return result
         }
 
