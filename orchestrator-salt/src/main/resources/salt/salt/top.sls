@@ -4,7 +4,6 @@ base:
     - unbound
     - java
     - metadata
-    - nginx
 
   'roles:kerberos_server':
     - match: grain
