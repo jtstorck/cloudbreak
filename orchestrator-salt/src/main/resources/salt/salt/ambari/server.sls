@@ -86,6 +86,13 @@ modify_hadoop_env_template:
   cmd.run:
     - name: /opt/javaagent.sh
 
+/opt/ambari-server/install-hdf-mpack.sh:
+  file.managed:
+    - makedirs: True
+    - source: salt://ambari/scripts/install-hdf-mpack.sh
+    - template: jinja
+    - mode: 744
+
 add_amazon2017_patch_script_server:
   file.managed:
     - name: /tmp/amazon2017.sh
@@ -100,3 +107,15 @@ run_amazon2017_sh_server:
     - unless: ls /var/log/amazon2017_server_sh.log
     - require:
       - file: add_amazon2017_patch_script_server
+
+install_hdf_mpack:
+  cmd.run:
+    - name: /opt/ambari-server/install-hdf-mpack.sh
+    - shell: /bin/bash
+    - unless: test -f /var/hdf_mpack_installed
+
+hdf_mpack_installed:
+  cmd.run:
+    - name: touch /var/hdf_mpack_installed
+    - shell: /bin/bash
+    - unless: test -f /var/hdf_mpack_installed
