@@ -2,7 +2,7 @@
   "Blueprints": {
     "blueprint_name": "hdf",
     "stack_name": "HDF",
-    "stack_version": "2.1"
+    "stack_version": "3.0"
   },
   "configurations": [
     {
